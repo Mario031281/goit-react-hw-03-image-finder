@@ -13,56 +13,39 @@ export class App extends Component {
     images: [],
     page: 1,
     totalPages: 0,
-    loading: false,
+    isloading: false,
+    error: null,
   };
   changeQuery = newQuery => {
-    try {
-      this.setState({
-        query: `${Date.now()}/${newQuery}`,
-        images: [],
-        page: 1,
-        topic: '',
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    this.setState({
+      query: newQuery,
+      images: [],
+      page: 1,
+      topic: '',
+    });
   };
-  async componentDidMount() {
-    const { query, page } = this.state;
-    const images = await fetchImages(query, page);
-    try {
-      this.setState({ images });
-    } catch (error) {}
-  }
 
   componentDidUpdate(prevProps, prevState) {
-    if (
-      prevState.query !== this.state.query ||
-      prevState.page !== this.state.page
-    ) {
-      const slashIndex = this.state.query.indexOf('/');
-      if (slashIndex !== -1) {
-        const newQueryPart = this.state.query.slice(slashIndex + 1);
-
-        fetchImages(newQueryPart, this.state.page)
-          .then(data => {
-            this.setState(prevState => ({
-              images: [...prevState.images, ...data.hits],
-            }));
-          })
-          .catch(error => {
-            console.error('Помилка при завантаженні зображень:', error);
-          });
-      }
+    const { query, page } = this.state;
+    if (prevState.query !== query || prevState.page !== page) {
+      this.setState({ isLoading: true });
+      fetchImages(query, page)
+        .then(data => {
+          this.setState(prevState => ({
+            images: [...prevState.images, ...data.hits],
+          }));
+        })
+        .catch(error => {
+          console.error('Помилка при завантаженні зображень:', error);
+        })
+        .finally(() => {
+          this.setState({ isLoading: false });
+        });
     }
   }
 
   handleLoadMore = () => {
-    try {
-      this.setState(prevState => ({ page: prevState.page + 1 }));
-    } catch (error) {
-      console.log(error);
-    }
+    this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
   render() {
