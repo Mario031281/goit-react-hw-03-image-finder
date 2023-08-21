@@ -17,8 +17,9 @@ export const customStyles = {
     zIndex: 100001,
   },
 };
-
+Modal.setAppElement('#root');
 export class ImageModal extends Component {
+  state = { isOpen: false };
   render() {
     const { isOpen, onRequestClose, image } = this.props;
 

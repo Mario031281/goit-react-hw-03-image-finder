@@ -7,13 +7,15 @@ import { fetchImages } from 'api';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { GlobalStyle } from './GlobalStyled';
 import { StyledApp } from './App.styled';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+
 export class App extends Component {
   state = {
     query: '',
     images: [],
     page: 1,
-    totalPages: 0,
-    isloading: false,
+    totalImages: 0,
+    isLoading: false,
     error: null,
   };
   changeQuery = newQuery => {
@@ -21,7 +23,8 @@ export class App extends Component {
       query: newQuery,
       images: [],
       page: 1,
-      topic: '',
+      // topic: '',
+      totalImages: 0,
     });
   };
 
@@ -31,8 +34,12 @@ export class App extends Component {
       this.setState({ isLoading: true });
       fetchImages(query, page)
         .then(data => {
+          if (data.hits.length < 0) {
+            Notify.failure('No results .');
+          }
           this.setState(prevState => ({
             images: [...prevState.images, ...data.hits],
+            totalImages: data.totalHits,
           }));
         })
         .catch(error => {
@@ -49,40 +56,26 @@ export class App extends Component {
   };
 
   render() {
-    const { images, isLoading, page, totalPages } = this.state;
+    const { images, isLoading, page, totalImages } = this.state;
     return (
       <StyledApp>
-        <SearchBar
-          onSubmit={evt => {
-            evt.preventDefault();
-            const queryValue = evt.target.elements.query.value.trim();
-
-            if (queryValue === '') {
-              alert(`Enter the search data`);
-              return;
-            }
-
-            this.changeQuery(queryValue);
-
-            evt.target.reset();
-          }}
-        ></SearchBar>
+        <SearchBar onSubmit={this.changeQuery} />
 
         {images.length > 0 ? (
           <ImageGallery images={images} />
         ) : (
           <p
             style={{
+              fontSize: 28,
               padding: 120,
               textAlign: 'center',
-              fontSize: 28,
             }}
           >
             Image gallery is empty...
           </p>
         )}
         {isLoading && <Loader />}
-        {images.length > 0 && totalPages !== page && !isLoading && (
+        {images.length > 0 && totalImages !== page && !isLoading && (
           <Btn onClick={this.handleLoadMore} />
         )}
 
