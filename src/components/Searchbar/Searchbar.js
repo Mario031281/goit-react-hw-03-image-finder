@@ -1,3 +1,4 @@
+import { FaSearch } from 'react-icons/fa';
 import React from 'react';
 import {
   SearchForm,
@@ -11,7 +12,9 @@ export const SearchBar = ({ onSubmit }) => {
     <Searchbar>
       <SearchForm onSubmit={onSubmit}>
         <SearchFormButton type="submit">
-          <SearchFormButtonLabel>Search</SearchFormButtonLabel>
+          <SearchFormButtonLabel>
+            <FaSearch />
+          </SearchFormButtonLabel>
         </SearchFormButton>
 
         <SearchFormInput
