@@ -23,7 +23,7 @@ export class App extends Component {
       query: newQuery,
       images: [],
       page: 1,
-      // topic: '',
+
       totalImages: 0,
     });
   };
