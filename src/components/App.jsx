@@ -19,6 +19,10 @@ export class App extends Component {
     error: null,
   };
   changeQuery = newQuery => {
+    if (this.state.query === newQuery) {
+      Notify.info('Change please your request.');
+      return;
+    }
     this.setState({
       query: newQuery,
       images: [],
@@ -37,8 +41,16 @@ export class App extends Component {
           if (data.hits.length < 0) {
             Notify.failure('No results .');
           }
+          const normalizeData = data.hits.map(
+            ({ id, tags, webformatURL, largeImageURL }) => ({
+              id,
+              tags,
+              webformatURL,
+              largeImageURL,
+            })
+          );
           this.setState(prevState => ({
-            images: [...prevState.images, ...data.hits],
+            images: [...prevState.images, ...normalizeData],
             totalImages: data.totalHits,
           }));
         })
@@ -56,7 +68,7 @@ export class App extends Component {
   };
 
   render() {
-    const { images, isLoading, page, totalImages } = this.state;
+    const { images, isLoading, totalImages } = this.state;
     return (
       <StyledApp>
         <SearchBar onSubmit={this.changeQuery} />
@@ -75,7 +87,7 @@ export class App extends Component {
           </p>
         )}
         {isLoading && <Loader />}
-        {images.length > 0 && totalImages !== page && !isLoading && (
+        {totalImages !== images.length && !isLoading && (
           <Btn onClick={this.handleLoadMore} />
         )}
 

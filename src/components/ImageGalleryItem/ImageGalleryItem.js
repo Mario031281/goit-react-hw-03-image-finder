@@ -31,7 +31,7 @@ export class ImageGalleryItem extends Component {
         <ImageModal
           isOpen={this.state.isModalOpen}
           onRequestClose={this.closeModal}
-          image={image}
+          image={{ tags: image.tags, largeImageURL: image.largeImageURL }}
         />
       </ImgGalleryItem>
     );
